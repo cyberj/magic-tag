@@ -2,7 +2,7 @@
 
 Little package to play with tags
 
-* Delete outer HTML tags
+* `ctrl-t ctrl-d` Delete outer HTML tags
 
 ## TODO
 

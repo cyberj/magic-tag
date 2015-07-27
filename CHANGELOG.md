@@ -1,3 +1,8 @@
+## 0.2.0 -
+* Improve code
+* Add test for multiple cursors
+* Add keymaps
+
 ## 0.1.0 - Minor fixes
 * Remove empty lines after deleting tags
 

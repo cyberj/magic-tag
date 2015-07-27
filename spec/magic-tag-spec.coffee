@@ -18,7 +18,6 @@ describe "MagicTag", ->
       atom.workspace.open('test.html')
 
     runs ->
-        console.log 'hey'
         editor = atom.workspace.getActiveTextEditor()
         editorElement = atom.views.getView(editor)
         {buffer} = editor
@@ -37,3 +36,12 @@ describe "MagicTag", ->
       expect(editor.lineTextForBufferRow(3)).toEqual('    <meta charset="utf-8">')
       expect(editor.lineTextForBufferRow(2)).toEqual('')
       expect(editor.lineTextForBufferRow(5)).toEqual('  <body>')
+
+    it "Fails if multiple cursors", ->
+      expect(editor.lineTextForBufferRow(5)).toEqual('    <title></title>')
+      console.log editor
+      editor.setCursorBufferPosition([5,11])
+      editor.addCursorAtBufferPosition([2,2])
+      expect(editor.hasMultipleCursors()).toBe(true)
+      atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
+      expect(editor.lineTextForBufferRow(5)).toEqual('    <title></title>')
