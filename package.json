@@ -1,10 +1,9 @@
 {
   "name": "magic-tag",
   "main": "./lib/magic-tag",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Delete outer HTML tags",
-  "keywords": [
-  ],
+  "keywords": [],
   "activationCommands": {
     "atom-workspace": "magic-tag:delete"
   },
@@ -13,6 +12,5 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
