@@ -15,49 +15,55 @@ module.exports = MagicTag =
     @subscriptions.dispose()
 
   delete: ->
-    console.log 'MagicTag requested a delete'
-    optag = edtag = null
     if editor = atom.workspace.getActiveTextEditor()
       # I can't handle multiple curors
       return false if editor.hasMultipleCursors()
       mycursor = editor.getCursorBufferPosition()
-      console.log mycursor
+      {buffer} = editor
 
       rangetobegin = [[0,0], mycursor]
       rangetoend = [mycursor, [Infinity, Infinity]]
       htmlregop = /<([\w \d \s]+)([^<]+)([^<]+) *[^\/?]>/g
+
+      # Find backwards for a html tag
       editor.backwardsScanInBufferRange(htmlregop, rangetobegin, (result) =>
         @optag = result.range.copy()
-        console.log @optag
         @beforetag = editor.getTextInBufferRange(@optag)
-        console.log "trying before = #{@beforetag}"
         # Now gets tag title
         gettag = /<([\w]+) ?/
         @beforetagtitle = gettag.exec(@beforetag)[1]
-        console.log "trying beforetagtitle = #{@beforetagtitle}"
         htmlclosereg = new RegExp("<\/#{@beforetagtitle} *>")
         editor.scanInBufferRange(htmlclosereg, rangetoend, (result) =>
           @edtag = result.range.copy()
-          console.log @edtag
-          console.log @optag
           @aftertag = editor.getTextInBufferRange(@edtag)
-          console.log "after = #{@aftertag}"
           result.stop()
         )
+        # Stops only if we found a corresponding closing tag
         if @edtag?
-          console.log "Got it !"
           result.stop()
-        else
-          console.log "Carry on"
-        console.log "end3 = #{@edtag}"
       )
-      console.log "after = #{@aftertag}"
-      console.log "before = #{@beforetag}"
-      console.log "before2 = #{@optag}"
-      console.log "end2 = #{@edtag}"
+
+      # No tag found : nothing to do
       return false if not @edtag? or not @optag?
+      edmark = buffer.markRange(@edtag)
+      opmark = buffer.markRange(@optag)
       # and now the end
-      editor.setSelectedBufferRanges([@optag, @edtag])
-      editor.delete()
-      editor.setCursorBufferPosition(mycursor)
+      console.log "hey"
+      buffer.transact =>
+        buffer.delete(@edtag)
+        if buffer.isRowBlank(@edtag.start.row)
+          buffer.deleteRow(@edtag.start.row)
+        buffer.delete(@optag)
+        if buffer.isRowBlank(@optag.start.row)
+          buffer.deleteRow(@optag.start.row)
+        curpos = editor.getCursorBufferPosition()
+        console.log curpos.column
+        if curpos.column == 0
+          console.log "Zero !"
+          curpos.row = curpos.row - 1
+          curpos.column = Infinity
+          editor.setCursorBufferPosition(curpos)
+      console.log "hey2"
+
+      # editor.setCursorBufferPosition(mycursor)
       @optag = @edtag = null

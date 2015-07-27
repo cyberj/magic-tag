@@ -31,5 +31,9 @@ describe "MagicTag", ->
       # This is an activation event, triggering it will cause the package to be
       # activated.
       atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
-      expect(editor.lineTextForBufferRow(5)).toEqual('    ')
-      expect(editor.getCursorBufferPosition()).toEqual([5, 4])
+      expect(editor.lineTextForBufferRow(5)).toEqual('  </head>')
+      expect(editor.getCursorBufferPosition()).toEqual([4, 26])
+      atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
+      expect(editor.lineTextForBufferRow(3)).toEqual('    <meta charset="utf-8">')
+      expect(editor.lineTextForBufferRow(2)).toEqual('')
+      expect(editor.lineTextForBufferRow(5)).toEqual('  <body>')
