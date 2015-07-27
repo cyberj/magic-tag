@@ -1,0 +1,22 @@
+# See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'Delete outer tag'
+      'command': 'magic-tag:delete'
+    }
+  ]
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'magic-tag'
+      'submenu': [
+        {
+          'label': 'Delete outertag'
+          'command': 'magic-tag:delete'
+        }
+      ]
+    ]
+  }
+]

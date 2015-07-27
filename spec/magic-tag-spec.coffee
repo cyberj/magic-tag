@@ -1,0 +1,35 @@
+MagicTag = require '../lib/magic-tag'
+{Point} = require 'atom'
+
+# Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
+#
+# To run a specific `it` or `describe` block add an `f` to the front (e.g. `fit`
+# or `fdescribe`). Remove the `f` to unfocus the block.
+
+describe "MagicTag", ->
+  [workspaceElement, editorElement, editor, buffer] = []
+
+  beforeEach ->
+    workspaceElement = atom.views.getView(atom.workspace)
+
+    atom.packages.activatePackage('magic-tag')
+
+    waitsForPromise ->
+      atom.workspace.open('test.html')
+
+    runs ->
+        console.log 'hey'
+        editor = atom.workspace.getActiveTextEditor()
+        editorElement = atom.views.getView(editor)
+        {buffer} = editor
+
+  describe "When tag is in same line", ->
+
+    it "delete all HTML tag", ->
+      editor.setCursorBufferPosition([5, 11])
+      expect(editor.lineTextForBufferRow(5)).toEqual('    <title></title>')
+      # This is an activation event, triggering it will cause the package to be
+      # activated.
+      atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
+      expect(editor.lineTextForBufferRow(5)).toEqual('    ')
+      expect(editor.getCursorBufferPosition()).toEqual([5, 4])
