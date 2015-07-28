@@ -1,3 +1,6 @@
+## 0.2.3 -
+* Improve README
+
 ## 0.2.2 -
 * Fix regexp for small tags and composite
 
