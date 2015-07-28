@@ -45,3 +45,10 @@ describe "MagicTag", ->
       expect(editor.hasMultipleCursors()).toBe(true)
       atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
       expect(editor.lineTextForBufferRow(5)).toEqual('    <title></title>')
+
+    it "delete small HTML tags", ->
+      editor.setCursorBufferPosition([10,10])
+      expect(editor.lineTextForBufferRow(10)).toEqual('      <li></li>')
+      atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
+      expect(editor.lineTextForBufferRow(9)).toEqual('    <ul>')
+      expect(editor.lineTextForBufferRow(10)).toEqual('    </ul>')

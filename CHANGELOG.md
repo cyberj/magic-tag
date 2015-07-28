@@ -1,3 +1,6 @@
+## 0.2.1 -
+* Fix small tag bug
+
 ## 0.2.0 -
 * Improve code
 * Add test for multiple cursors

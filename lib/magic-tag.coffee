@@ -20,7 +20,7 @@ module.exports = MagicTag =
     editor = atom.workspace.getActiveTextEditor()
     rangetobegin = [[0,0], cursor]
     rangetoend = [cursor, [Infinity, Infinity]]
-    htmlregop = /<([\w \d \s]+)([^<]+)([^<]+) *[^\/?]>/g
+    htmlregop = /<([\w \d \s]+) *[^\/?]>/g
     optag = edtag = null
 
     editor.backwardsScanInBufferRange htmlregop, rangetobegin, (result) =>
