@@ -1,3 +1,6 @@
+## 0.2.2 -
+* Fix regexp for small tags and composite
+
 ## 0.2.1 -
 * Fix small tag bug
 

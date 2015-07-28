@@ -3,7 +3,7 @@
 module.exports = MagicTag =
   subscriptions: null
 
-  activate: (state) ->
+  activate: ->
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
@@ -20,7 +20,7 @@ module.exports = MagicTag =
     editor = atom.workspace.getActiveTextEditor()
     rangetobegin = [[0,0], cursor]
     rangetoend = [cursor, [Infinity, Infinity]]
-    htmlregop = /<([\w \d \s]+) *[^\/?]>/g
+    htmlregop = /<(?:[\w\d\s]+)(?:[^>]|\/(?!>))*>/g
     optag = edtag = null
 
     editor.backwardsScanInBufferRange htmlregop, rangetobegin, (result) =>
@@ -37,11 +37,10 @@ module.exports = MagicTag =
       # Stops only if we found a corresponding closing tag
       if edtag?
         result.stop()
-    console.log optag
-    console.log edtag
+    # console.log optag
+    # console.log edtag
     optag: optag
     edtag: edtag
-
 
   delete: ->
     if editor = atom.workspace.getActiveTextEditor()

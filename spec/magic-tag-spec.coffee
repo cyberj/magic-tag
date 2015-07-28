@@ -7,12 +7,18 @@ MagicTag = require '../lib/magic-tag'
 # or `fdescribe`). Remove the `f` to unfocus the block.
 
 describe "MagicTag", ->
-  [workspaceElement, editorElement, editor, buffer] = []
+  [workspaceElement, editorElement, editor, buffer, activationPromise] = []
+
+  # See https://discuss.atom.io/t/how-do-i-activate-a-package-in-specs/18766
+  executeCommand = (callback) ->
+    atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
+    waitsForPromise -> activationPromise
+    runs(callback)
 
   beforeEach ->
     workspaceElement = atom.views.getView(atom.workspace)
 
-    atom.packages.activatePackage('magic-tag')
+    activationPromise = atom.packages.activatePackage('magic-tag')
 
     waitsForPromise ->
       atom.workspace.open('test.html')
@@ -29,26 +35,37 @@ describe "MagicTag", ->
       expect(editor.lineTextForBufferRow(5)).toEqual('    <title></title>')
       # This is an activation event, triggering it will cause the package to be
       # activated.
-      atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
-      expect(editor.lineTextForBufferRow(5)).toEqual('  </head>')
-      expect(editor.getCursorBufferPosition()).toEqual([4, 26])
-      atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
-      expect(editor.lineTextForBufferRow(3)).toEqual('    <meta charset="utf-8">')
-      expect(editor.lineTextForBufferRow(2)).toEqual('')
-      expect(editor.lineTextForBufferRow(5)).toEqual('  <body>')
+      executeCommand ->
+        expect(editor.lineTextForBufferRow(5)).toEqual('  </head>')
+        expect(editor.getCursorBufferPosition()).toEqual([4, 26])
+        executeCommand ->
+          expect(editor.lineTextForBufferRow(3)).toEqual('    <meta charset="utf-8">')
+          expect(editor.lineTextForBufferRow(2)).toEqual('')
+          expect(editor.lineTextForBufferRow(5)).toEqual('  <body>')
 
     it "Fails if multiple cursors", ->
       expect(editor.lineTextForBufferRow(5)).toEqual('    <title></title>')
-      console.log editor
       editor.setCursorBufferPosition([5,11])
       editor.addCursorAtBufferPosition([2,2])
       expect(editor.hasMultipleCursors()).toBe(true)
-      atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
-      expect(editor.lineTextForBufferRow(5)).toEqual('    <title></title>')
+      executeCommand ->
+        expect(editor.lineTextForBufferRow(5)).toEqual('    <title></title>')
 
     it "delete small HTML tags", ->
-      editor.setCursorBufferPosition([10,10])
-      expect(editor.lineTextForBufferRow(10)).toEqual('      <li></li>')
-      atom.commands.dispatch(workspaceElement, 'magic-tag:delete')
-      expect(editor.lineTextForBufferRow(9)).toEqual('    <ul>')
-      expect(editor.lineTextForBufferRow(10)).toEqual('    </ul>')
+      editor.setCursorBufferPosition([10,13])
+      expect(editor.lineTextForBufferRow(10)).toEqual('      <li><a></a></li>')
+      executeCommand ->
+        expect(editor.lineTextForBufferRow(10)).toEqual('      <li></li>')
+        executeCommand ->
+          expect(editor.lineTextForBufferRow(9)).toEqual('    <ul>')
+          expect(editor.lineTextForBufferRow(10)).toEqual('    </ul>')
+
+  # describe "Snif", ->
+    it "delete composite HTML tags", ->
+      expect(editor.lineTextForBufferRow(14)).toEqual('<div class="toto" id="tata">')
+      expect(editor.lineTextForBufferRow(15)).toEqual('  <a href="//#">Hello</a>')
+      editor.setCursorBufferPosition([15,16])
+      executeCommand ->
+        expect(editor.lineTextForBufferRow(15)).toEqual('  Hello')
+        executeCommand ->
+          expect(editor.lineTextForBufferRow(14)).toEqual('  Hello')
