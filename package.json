@@ -1,7 +1,7 @@
 {
   "name": "magic-tag",
   "main": "./lib/magic-tag",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Delete outer HTML tags",
   "keywords": [],
   "activationCommands": {
